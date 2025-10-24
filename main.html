@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Video Transcription Platform</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="particles" id="particles"></div>
+  
+  <div class="container">
+    <header class="header">
+      <h1>Video Transcription</h1>
+      <p>Upload videos or paste YouTube links to get instant transcripts</p>
+    </header>
+
+    <div class="main-card">
+      <div class="card-header">
+        <span class="cloud-icon">🎬</span>
+        <h2>Upload Video</h2>
+      </div>
+
+      <!-- File Upload Section -->
+      <div class="form-group">
+        <label>Upload Video File</label>
+        <div class="file-input-wrapper">
+          <input type="file" id="video-upload" accept="video/*">
+          <label for="video-upload" class="file-label">
+            <span class="folder-icon">📁</span>
+            Choose Video File
+          </label>
+        </div>
+        <div id="file-name" class="file-name-display"></div>
+      </div>
+
+      <!-- Divider -->
+      <div class="divider">
+        <span>OR</span>
+      </div>
+
+      <!-- YouTube Link Section -->
+      <div class="form-group">
+        <label>Paste YouTube Link</label>
+        <input 
+          type="text" 
+          id="youtube-link" 
+          class="yt-input" 
+          placeholder="https://www.youtube.com/watch?v=..."
+        >
+      </div>
+
+      <!-- Transcribe Button -->
+      <button class="btn" id="transcribe-btn" disabled>
+        Generate Transcript
+      </button>
+
+      <!-- Status Display -->
+      <div id="status" class="status-text">Please upload a video or paste a YouTube link</div>
+
+      <!-- Transcript Output -->
+      <div class="form-group" id="transcript-section" style="display: none;">
+        <label>Generated Transcript</label>
+        <textarea id="transcript-output" readonly placeholder="Your transcript will appear here..."></textarea>
+        <button class="btn btn-copy" onclick="copyTranscript()">Copy Transcript</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hidden video element for audio processing -->
+  <video id="video-player" style="display: none;"></video>
+
+  <script type="module" src="script.js"></script>
+</body>
+</html>
