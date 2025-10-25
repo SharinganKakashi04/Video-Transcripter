@@ -1,75 +1,590 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AT Video Transcription</title>
-  <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AT Video Transcription</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #6b46c1 0%, #343234 100%);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(circle at 20% 50%, rgba(139, 126, 200, 0.4) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(157, 126, 200, 0.4) 0%, transparent 50%);
+            animation: gradientShift 15s ease infinite;
+            z-index: 0;
+        }
+
+        @keyframes gradientShift {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.8;
+            }
+        }
+
+        .container {
+            position: relative;
+            z-index: 2;
+            max-width: 700px;
+            width: 100%;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            padding: 2rem 0 3rem 0;
+            animation: slideDown 0.8s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 1rem;
+            letter-spacing: -1px;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 400;
+        }
+
+        .main-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 3rem;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            box-shadow:
+                0 8px 32px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            animation: fadeInUp 0.8s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .cloud-icon {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #ec4899, #f472b6);
+            border-radius: 12px;
+            font-size: 1.8rem;
+        }
+
+        .card-header h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin: 0;
+        }
+
+        .form-group {
+            margin-bottom: 2rem;
+        }
+
+        label {
+            display: block;
+            color: rgba(255, 255, 255, 0.95);
+            font-weight: 500;
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+        }
+
+        .yt-input {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            color: #ffffff;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            font-family: inherit;
+        }
+
+        .yt-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .yt-input:focus {
+            outline: none;
+            border-color: #f472b6;
+            background: rgba(255, 255, 255, 0.18);
+            box-shadow: 0 0 0 3px rgba(244, 114, 182, 0.2);
+        }
+
+        textarea {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            color: #ffffff;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            font-family: inherit;
+            resize: vertical;
+            min-height: 150px;
+        }
+
+        textarea::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #f472b6;
+            background: rgba(255, 255, 255, 0.18);
+            box-shadow: 0 0 0 3px rgba(244, 114, 182, 0.2);
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .file-input-wrapper input[type="file"] {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .file-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.12);
+            border: 2px dashed rgba(255, 255, 255, 0.35);
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: rgba(255, 255, 255, 0.95);
+            font-weight: 500;
+            font-size: 1.05rem;
+        }
+
+        .file-label:hover {
+            background: rgba(255, 255, 255, 0.18);
+            border-color: #f472b6;
+            transform: translateY(-2px);
+        }
+
+        .folder-icon {
+            font-size: 1.8rem;
+        }
+
+        .file-name-display {
+            margin-top: 1rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.95rem;
+            background: rgba(255, 255, 255, 0.12);
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            display: none;
+        }
+
+        .file-name-display.show {
+            display: block;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 2rem 0;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 500;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .divider span {
+            padding: 0 1rem;
+            font-size: 0.9rem;
+        }
+
+        .status-text {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.95rem;
+            margin-top: 1rem;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .status-text.processing {
+            background: rgba(236, 72, 153, 0.2);
+            color: #ffffff;
+            font-weight: 500;
+        }
+
+        .status-text.processing::before {
+            content: '⏳ ';
+        }
+
+        .btn {
+            width: 100%;
+            padding: 1.1rem 2rem;
+            background: linear-gradient(135deg, #ec4899, #f472b6);
+            color: #ffffff;
+            border: none;
+            border-radius: 16px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(236, 72, 153, 0.4);
+            margin-top: 0.5rem;
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(236, 72, 153, 0.6);
+        }
+
+        .btn:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn.ready {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                box-shadow: 0 4px 20px rgba(236, 72, 153, 0.4);
+            }
+
+            50% {
+                box-shadow: 0 4px 30px rgba(236, 72, 153, 0.8);
+            }
+        }
+
+        .btn-copy {
+            margin-top: 1rem;
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 2px 10px rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-copy:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.2rem;
+            }
+
+            .header p {
+                font-size: 1rem;
+            }
+
+            .main-card {
+                padding: 2rem;
+            }
+
+            .card-header h2 {
+                font-size: 1.5rem;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+        }
+    </style>
 </head>
+
 <body>
-  <div class="particles" id="particles"></div>
-  
-  <div class="container">
-    <header class="header">
-      <h1>AT Video Transcription</h1>
-      <p>Upload videos or paste YouTube links to get instant transcripts</p>
-    </header>
+    <div class="container">
+        <header class="header">
+            <h1>AT Video Transcription</h1>
+            <p>Upload videos or paste YouTube links to get instant transcripts</p>
+        </header>
 
-    <div class="main-card">
-      <div class="card-header">
-        <span class="cloud-icon">🎬</span>
-        <h2>Upload Video</h2>
-      </div>
+        <div class="main-card">
+            <div class="card-header">
+                <span class="cloud-icon">🎬</span>
+                <h2>Upload Video</h2>
+            </div>
 
-      <!-- File Upload Section -->
-      <div class="form-group">
-        <label>Upload Video File</label>
-        <div class="file-input-wrapper">
-          <input type="file" id="video-upload" accept="video/*">
-          <label for="video-upload" class="file-label">
-            <span class="folder-icon">📁</span>
-            Choose Video File
-          </label>
+            <!-- File Upload Section -->
+            <div class="form-group">
+                <label>Upload Video File</label>
+                <div class="file-input-wrapper">
+                    <input type="file" id="video-upload" accept="video/*">
+                    <label for="video-upload" class="file-label">
+                        <span class="folder-icon">📁</span>
+                        <span id="file-label-text">Choose Video File</span>
+                    </label>
+                </div>
+                <div id="file-name" class="file-name-display"></div>
+            </div>
+
+            <!-- Divider -->
+            <div class="divider">
+                <span>OR</span>
+            </div>
+
+            <!-- YouTube Link Section -->
+            <div class="form-group">
+                <label>Paste YouTube Link</label>
+                <input type="text" id="youtube-link" class="yt-input" placeholder="https://www.youtube.com/watch?v=...">
+            </div>
+
+            <!-- Transcribe Button -->
+            <button class="btn" id="transcribe-btn" disabled>
+                Generate Transcript
+            </button>
+
+            <!-- Status Display -->
+            <div id="status" class="status-text">Please upload a video or paste a YouTube link</div>
+
+            <!-- Transcript Output -->
+            <div class="form-group" id="transcript-section" style="display: none;">
+                <label>Generated Transcript</label>
+                <textarea id="transcript-output" readonly placeholder="Your transcript will appear here..."></textarea>
+                <button class="btn btn-copy" id="copy-btn">Copy Transcript</button>
+            </div>
         </div>
-        <div id="file-name" class="file-name-display"></div>
-      </div>
-
-      <!-- Divider -->
-      <div class="divider">
-        <span>OR</span>
-      </div>
-
-      <!-- YouTube Link Section -->
-      <div class="form-group">
-        <label>Paste YouTube Link</label>
-        <input 
-          type="text" 
-          id="youtube-link" 
-          class="yt-input" 
-          placeholder="https://www.youtube.com/watch?v=..."
-        >
-      </div>
-
-      <!-- Transcribe Button -->
-      <button class="btn" id="transcribe-btn" disabled>
-        Generate Transcript
-      </button>
-
-      <!-- Status Display -->
-      <div id="status" class="status-text">Please upload a video or paste a YouTube link</div>
-
-      <!-- Transcript Output -->
-      <div class="form-group" id="transcript-section" style="display: none;">
-        <label>Generated Transcript</label>
-        <textarea id="transcript-output" readonly placeholder="Your transcript will appear here..."></textarea>
-        <button class="btn btn-copy" onclick="copyTranscript()">Copy Transcript</button>
-      </div>
     </div>
-  </div>
 
-  <!-- Hidden video element for audio processing -->
-  <video id="video-player" style="display: none;"></video>
+    <!-- Hidden video element for audio processing -->
+    <video id="video-player" style="display: none;"></video>
 
-  <script type="module" src="script.js"></script>
+    <script type="module">
+        // Import Transformers.js
+        import { pipeline } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.1';
+
+        // Get all HTML elements
+        const fileUpload = document.getElementById('video-upload');
+        const fileLabelText = document.getElementById('file-label-text');
+        const fileNameDisplay = document.getElementById('file-name');
+        const transcribeBtn = document.getElementById('transcribe-btn');
+        const statusText = document.getElementById('status');
+        const transcriptOutput = document.getElementById('transcript-output');
+        const transcriptSection = document.getElementById('transcript-section');
+        const videoPlayer = document.getElementById('video-player');
+        const youtubeLinkInput = document.getElementById('youtube-link');
+        const copyBtn = document.getElementById('copy-btn');
+
+        // Shared state
+        let transcriber = null;
+        let isModelLoading = false;
+
+        // Load the AI model
+        async function loadTranscriber() {
+            if (transcriber || isModelLoading) return;
+
+            isModelLoading = true;
+            updateStatus('Loading transcription model... (this may take a moment)', true);
+
+            try {
+                transcriber = await pipeline('automatic-speech-recognition', 'Xenova/whisper-tiny.en');
+                updateStatus('Model loaded. Ready to transcribe.');
+            } catch (error) {
+                console.error('Model loading failed:', error);
+                updateStatus('Error: Could not load model. Please refresh the page.');
+            } finally {
+                isModelLoading = false;
+            }
+        }
+
+        // File upload handler
+        fileUpload.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                fileLabelText.textContent = file.name;
+                fileNameDisplay.textContent = `Selected: ${file.name}`;
+                fileNameDisplay.classList.add('show');
+                videoPlayer.src = URL.createObjectURL(file);
+                transcribeBtn.disabled = false;
+                transcribeBtn.classList.add('ready');
+                updateStatus('File selected. Ready to transcribe!');
+                transcriptSection.style.display = 'none';
+            }
+        });
+
+        // YouTube link handler
+        youtubeLinkInput.addEventListener('input', (e) => {
+            if (e.target.value) {
+                updateStatus('YouTube transcription requires a backend setup. Please use file upload instead.');
+            }
+        });
+
+        // Transcribe button handler
+        transcribeBtn.addEventListener('click', async () => {
+            transcribeBtn.disabled = true;
+            transcribeBtn.classList.remove('ready');
+
+            try {
+                // Load model if needed
+                if (!transcriber) await loadTranscriber();
+                if (!transcriber) throw new Error("Model not available.");
+
+                // Extract audio
+                updateStatus('Processing audio from video file...', true);
+                const audioData = await extractAndResampleAudio(videoPlayer);
+                if (!audioData) throw new Error("Could not extract audio. Please try a different file.");
+
+                // Transcribe
+                updateStatus('Transcribing audio... This can take a while.', true);
+                const output = await transcriber(audioData, {
+                    chunk_length_s: 30,
+                    stride_length_s: 5,
+                });
+
+                // Display result
+                updateStatus('Transcription complete!');
+                transcriptOutput.value = output.text;
+                transcriptSection.style.display = 'block';
+
+            } catch (error) {
+                console.error('Transcription failed:', error);
+                updateStatus(`Error: ${error.message}`);
+            } finally {
+                transcribeBtn.disabled = false;
+            }
+        });
+
+        // Copy button handler
+        copyBtn.addEventListener('click', () => {
+            navigator.clipboard.writeText(transcriptOutput.value);
+            copyBtn.textContent = '✓ Copied!';
+            setTimeout(() => {
+                copyBtn.textContent = 'Copy Transcript';
+            }, 2000);
+        });
+
+        // Update status function
+        function updateStatus(message, showSpinner = false) {
+            statusText.textContent = message;
+            if (showSpinner) {
+                statusText.classList.add('processing');
+            } else {
+                statusText.classList.remove('processing');
+            }
+        }
+
+        // Extract and resample audio
+        async function extractAndResampleAudio(videoElement) {
+            try {
+                // Wait for metadata
+                if (!videoElement.duration) {
+                    await new Promise((resolve, reject) => {
+                        videoElement.onloadedmetadata = resolve;
+                        videoElement.onerror = reject;
+                        setTimeout(() => reject(new Error('Timeout')), 10000);
+                    });
+                }
+
+                const audioContext = new AudioContext({ sampleRate: 16000 });
+                const response = await fetch(videoElement.src);
+                const arrayBuffer = await response.arrayBuffer();
+                const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+
+                // Get mono channel data
+                let audioData;
+                if (audioBuffer.numberOfChannels === 1) {
+                    audioData = audioBuffer.getChannelData(0);
+                } else {
+                    // Convert to mono by averaging channels
+                    const left = audioBuffer.getChannelData(0);
+                    const right = audioBuffer.getChannelData(1);
+                    audioData = new Float32Array(left.length);
+                    for (let i = 0; i < left.length; i++) {
+                        audioData[i] = (left[i] + right[i]) / 2;
+                    }
+                }
+
+                audioContext.close();
+                return audioData;
+
+            } catch (error) {
+                console.error('Audio extraction failed:', error);
+                return null;
+            }
+        }
+    </script>
 </body>
+
 </html>
