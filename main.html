@@ -350,6 +350,159 @@
             box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
         }
 
+        .settings-btn {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            width: 48px;
+            height: 48px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .settings-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: rotate(90deg);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .modal {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 2.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .modal-header h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin: 0;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+        }
+
+        .modal-info {
+            background: rgba(236, 72, 153, 0.15);
+            border: 1px solid rgba(236, 72, 153, 0.3);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .modal-info a {
+            color: #f472b6;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .modal-info a:hover {
+            text-decoration: underline;
+        }
+
+        .credentials-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .credentials-status.configured {
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .credentials-status.not-configured {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 2.2rem;
@@ -370,15 +523,68 @@
             .container {
                 padding: 1rem;
             }
+
+            .settings-btn {
+                top: 1rem;
+                right: 1rem;
+            }
+
+            .modal {
+                padding: 1.5rem;
+            }
         }
     </style>
 </head>
 
 <body>
+    <!-- Settings Button -->
+    <button class="settings-btn" id="settings-btn" title="Google Drive Settings">⚙️</button>
+
+    <!-- Settings Modal -->
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Google Drive Settings</h2>
+                <button class="close-btn" id="close-modal">×</button>
+            </div>
+
+            <div class="credentials-status" id="credentials-status">
+                <span>🔴</span>
+                <span>Google Drive: Not Configured</span>
+            </div>
+
+            <div class="modal-info">
+                <strong>📝 Setup Instructions:</strong><br>
+                1. Go to <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a><br>
+                2. Create a project and enable "Google Drive API" and "Google Picker API"<br>
+                3. Create credentials (API Key + OAuth 2.0 Client ID)<br>
+                4. Add your domain to authorized JavaScript origins<br>
+                5. Paste your credentials below
+            </div>
+
+            <div class="form-group">
+                <label>Client ID</label>
+                <input type="text" id="client-id-input" class="yt-input" placeholder="xxxxx.apps.googleusercontent.com">
+            </div>
+
+            <div class="form-group">
+                <label>API Key</label>
+                <input type="text" id="api-key-input" class="yt-input" placeholder="AIzaSy...">
+            </div>
+
+            <div class="form-group">
+                <label>App ID (Project Number)</label>
+                <input type="text" id="app-id-input" class="yt-input" placeholder="123456789">
+            </div>
+
+            <button class="btn" id="save-credentials-btn">Save Credentials</button>
+        </div>
+    </div>
+
     <div class="container">
         <header class="header">
             <h1>AT Video Transcription</h1>
-            <p>Upload videos or paste YouTube links to get instant transcripts</p>
+            <p>Upload videos or use Google Drive to get instant transcripts</p>
         </header>
 
         <div class="main-card">
@@ -405,10 +611,16 @@
                 <span>OR</span>
             </div>
 
-            <!-- YouTube Link Section -->
+            <!-- Google Drive Upload Section -->
             <div class="form-group">
-                <label>Paste YouTube Link</label>
-                <input type="text" id="youtube-link" class="yt-input" placeholder="https://www.youtube.com/watch?v=...">
+                <label>Upload from Google Drive</label>
+                <div class="file-input-wrapper">
+                    <button type="button" id="google-drive-btn" class="file-label" style="border-style: solid;">
+                        <span class="folder-icon">☁️</span>
+                        <span>Choose from Google Drive</span>
+                    </button>
+                </div>
+                <div id="drive-file-name" class="file-name-display"></div>
             </div>
 
             <!-- Transcribe Button -->
@@ -417,7 +629,7 @@
             </button>
 
             <!-- Status Display -->
-            <div id="status" class="status-text">Please upload a video or paste a YouTube link</div>
+            <div id="status" class="status-text">Please upload a video or choose from Google Drive</div>
 
             <!-- Transcript Output -->
             <div class="form-group" id="transcript-section" style="display: none;">
@@ -430,6 +642,10 @@
 
     <!-- Hidden video element for audio processing -->
     <video id="video-player" style="display: none;"></video>
+
+    <!-- Google Drive Picker API -->
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="https://accounts.google.com/gsi/client"></script>
 
     <script type="module">
         // Import Transformers.js
@@ -444,12 +660,94 @@
         const transcriptOutput = document.getElementById('transcript-output');
         const transcriptSection = document.getElementById('transcript-section');
         const videoPlayer = document.getElementById('video-player');
-        const youtubeLinkInput = document.getElementById('youtube-link');
+        const googleDriveBtn = document.getElementById('google-drive-btn');
+        const driveFileNameDisplay = document.getElementById('drive-file-name');
         const copyBtn = document.getElementById('copy-btn');
+
+        // Modal elements
+        const settingsBtn = document.getElementById('settings-btn');
+        const modalOverlay = document.getElementById('modal-overlay');
+        const closeModal = document.getElementById('close-modal');
+        const clientIdInput = document.getElementById('client-id-input');
+        const apiKeyInput = document.getElementById('api-key-input');
+        const appIdInput = document.getElementById('app-id-input');
+        const saveCredentialsBtn = document.getElementById('save-credentials-btn');
+        const credentialsStatus = document.getElementById('credentials-status');
+
+        // Google credentials (stored in browser session)
+        let CLIENT_ID = '';
+        let API_KEY = '';
+        let APP_ID = '';
 
         // Shared state
         let transcriber = null;
         let isModelLoading = false;
+        let pickerInited = false;
+        let gisInited = false;
+        let tokenClient;
+        let accessToken = null;
+
+        // Load credentials from sessionStorage
+        function loadCredentials() {
+            CLIENT_ID = sessionStorage.getItem('google_client_id') || '';
+            API_KEY = sessionStorage.getItem('google_api_key') || '';
+            APP_ID = sessionStorage.getItem('google_app_id') || '';
+
+            if (CLIENT_ID && API_KEY && APP_ID) {
+                credentialsStatus.innerHTML = '<span>🟢</span><span>Google Drive: Configured</span>';
+                credentialsStatus.className = 'credentials-status configured';
+                initializeGoogleAPIs();
+            } else {
+                credentialsStatus.innerHTML = '<span>🔴</span><span>Google Drive: Not Configured</span>';
+                credentialsStatus.className = 'credentials-status not-configured';
+            }
+
+            clientIdInput.value = CLIENT_ID;
+            apiKeyInput.value = API_KEY;
+            appIdInput.value = APP_ID;
+        }
+
+        // Save credentials to sessionStorage
+        saveCredentialsBtn.addEventListener('click', () => {
+            const clientId = clientIdInput.value.trim();
+            const apiKey = apiKeyInput.value.trim();
+            const appId = appIdInput.value.trim();
+
+            if (!clientId || !apiKey || !appId) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            sessionStorage.setItem('google_client_id', clientId);
+            sessionStorage.setItem('google_api_key', apiKey);
+            sessionStorage.setItem('google_app_id', appId);
+
+            CLIENT_ID = clientId;
+            API_KEY = apiKey;
+            APP_ID = appId;
+
+            loadCredentials();
+            modalOverlay.classList.remove('show');
+            updateStatus('Google Drive credentials saved! You can now use Google Drive upload.');
+        });
+
+        // Modal controls
+        settingsBtn.addEventListener('click', () => {
+            modalOverlay.classList.add('show');
+        });
+
+        closeModal.addEventListener('click', () => {
+            modalOverlay.classList.remove('show');
+        });
+
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) {
+                modalOverlay.classList.remove('show');
+            }
+        });
+
+        // Initialize credentials on load
+        loadCredentials();
 
         // Load the AI model
         async function loadTranscriber() {
@@ -484,12 +782,114 @@
             }
         });
 
-        // YouTube link handler
-        youtubeLinkInput.addEventListener('input', (e) => {
-            if (e.target.value) {
-                updateStatus('YouTube transcription requires a backend setup. Please use file upload instead.');
+        // Initialize Google APIs (only when credentials are available)
+        function initializeGoogleAPIs() {
+            if (!CLIENT_ID || !API_KEY || !APP_ID) {
+                return;
+            }
+            gapiLoaded();
+            gisLoaded();
+        }
+
+        // Initialize Google APIs
+        function gapiLoaded() {
+            gapi.load('client:picker', initializePicker);
+        }
+
+        async function initializePicker() {
+            await gapi.client.load('https://www.googleapis.com/discovery/v1/apis/drive/v3/rest');
+            pickerInited = true;
+        }
+
+        function gisLoaded() {
+            tokenClient = google.accounts.oauth2.initTokenClient({
+                client_id: CLIENT_ID,
+                scope: 'https://www.googleapis.com/auth/drive.readonly',
+                callback: '', // defined later
+            });
+            gisInited = true;
+        }
+
+        // Google Drive button handler
+        googleDriveBtn.addEventListener('click', () => {
+            if (!CLIENT_ID || !API_KEY || !APP_ID) {
+                updateStatus('Please configure Google Drive credentials first. Click the settings ⚙️ button.');
+                modalOverlay.classList.add('show');
+                return;
+            }
+
+            if (!pickerInited || !gisInited) {
+                updateStatus('Google Drive API is loading... Please try again in a moment.');
+                return;
+            }
+
+            tokenClient.callback = async (response) => {
+                if (response.error !== undefined) {
+                    throw response;
+                }
+                accessToken = response.access_token;
+                createPicker();
+            };
+
+            if (accessToken === null) {
+                tokenClient.requestAccessToken({ prompt: 'consent' });
+            } else {
+                tokenClient.requestAccessToken({ prompt: '' });
             }
         });
+
+        // Create the Google Drive Picker
+        function createPicker() {
+            const view = new google.picker.DocsView(google.picker.ViewId.DOCS)
+                .setMimeTypes('video/mp4,video/webm,video/ogg,video/quicktime,video/x-msvideo')
+                .setMode(google.picker.DocsViewMode.LIST);
+
+            const picker = new google.picker.PickerBuilder()
+                .setAppId(APP_ID)
+                .setOAuthToken(accessToken)
+                .addView(view)
+                .addView(new google.picker.DocsUploadView())
+                .setDeveloperKey(API_KEY)
+                .setCallback(pickerCallback)
+                .build();
+            picker.setVisible(true);
+        }
+
+        // Handle picker selection
+        async function pickerCallback(data) {
+            if (data.action === google.picker.Action.PICKED) {
+                const file = data.docs[0];
+                driveFileNameDisplay.textContent = `Selected: ${file.name}`;
+                driveFileNameDisplay.classList.add('show');
+                updateStatus('Downloading file from Google Drive...', true);
+
+                try {
+                    // Download the file
+                    const response = await gapi.client.drive.files.get({
+                        fileId: file.id,
+                        alt: 'media'
+                    }, {
+                        responseType: 'blob'
+                    });
+
+                    // Create blob URL
+                    const blob = new Blob([response.body], { type: file.mimeType });
+                    videoPlayer.src = URL.createObjectURL(blob);
+                    
+                    transcribeBtn.disabled = false;
+                    transcribeBtn.classList.add('ready');
+                    updateStatus('File downloaded. Ready to transcribe!');
+                    transcriptSection.style.display = 'none';
+                } catch (error) {
+                    console.error('Download failed:', error);
+                    updateStatus('Error downloading file from Google Drive.');
+                }
+            }
+        }
+
+        // Load Google APIs on page load (removed auto-initialization)
+        window.gapiLoaded = gapiLoaded;
+        window.gisLoaded = gisLoaded;
 
         // Transcribe button handler
         transcribeBtn.addEventListener('click', async () => {
