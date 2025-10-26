@@ -526,16 +526,22 @@
         // Create the Google Drive Picker
         function createPicker() {
             try {
-                // Create view for selecting files from Drive
+                // View for selecting existing files from Drive
                 const docsView = new google.picker.DocsView()
                     .setIncludeFolders(true)
                     .setMimeTypes('video/mp4,video/webm,video/ogg,video/quicktime,video/avi,video/x-msvideo,video/x-matroska,video/mkv');
+
+                // View for uploading new files
+                const uploadView = new google.picker.DocsUploadView()
+                    .setIncludeFolders(false)
+                    .setParent('root');
 
                 const picker = new google.picker.PickerBuilder()
                     .setDeveloperKey(API_KEY)
                     .setAppId(APP_ID)
                     .setOAuthToken(accessToken)
                     .addView(docsView)
+                    .addView(uploadView)
                     .setCallback(pickerCallback)
                     .setOrigin(window.location.protocol + '//' + window.location.host)
                     .setMaxItems(1)
