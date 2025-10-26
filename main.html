@@ -416,6 +416,7 @@
         // ⚠️ REPLACE THESE WITH YOUR ACTUAL CREDENTIALS ⚠️
         const CLIENT_ID = '822621451487-4dbnhrq9m6eijk0rk8baipoo84ojsp8q.apps.googleusercontent.com';
         const API_KEY = 'AIzaSyBw2Ae8R1-dJ0eI7ILxRyRP5gPqZEFZWpw';
+        
         const APP_ID = 'transcripter-476205';
 
         // Get all HTML elements
@@ -447,7 +448,10 @@
             updateStatus('Loading transcription model... (this may take a moment)', true);
 
             try {
-                transcriber = await pipeline('automatic-speech-recognition', 'Xenova/whisper-tiny.en');
+                transcriber = await pipeline('automatic-speech-recognition', 'Xenova/whisper-tiny.en', {
+                    quantized: true,
+                    revision: 'default'
+                });
                 updateStatus('Model loaded. Ready to transcribe.');
             } catch (error) {
                 console.error('Model loading failed:', error);
@@ -608,11 +612,13 @@
                 const audioData = await extractAndResampleAudio(videoPlayer);
                 if (!audioData) throw new Error("Could not extract audio. Please try a different file.");
 
-                // Transcribe
-                updateStatus('Transcribing audio... This can take a while.', true);
+                const durationMinutes = Math.ceil(audioData.length / 16000 / 60);
+                updateStatus(`Transcribing ${durationMinutes} minute(s) of audio... This may take 2-5 minutes.`, true);
                 const output = await transcriber(audioData, {
                     chunk_length_s: 30,
                     stride_length_s: 5,
+                    language: 'english',
+                    task: 'transcribe'
                 });
 
                 // Display result
