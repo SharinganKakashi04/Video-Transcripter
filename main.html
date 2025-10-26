@@ -525,19 +525,28 @@
 
         // Create the Google Drive Picker
         function createPicker() {
-            const view = new google.picker.DocsView(google.picker.ViewId.DOCS)
-                .setMimeTypes('video/mp4,video/webm,video/ogg,video/quicktime,video/x-msvideo,video/avi')
-                .setMode(google.picker.DocsViewMode.LIST);
+            try {
+                // Create view for selecting files from Drive
+                const docsView = new google.picker.DocsView()
+                    .setIncludeFolders(true)
+                    .setMimeTypes('video/mp4,video/webm,video/ogg,video/quicktime,video/avi,video/x-msvideo,video/x-matroska,video/mkv');
 
-            const picker = new google.picker.PickerBuilder()
-                .setAppId(APP_ID)
-                .setOAuthToken(accessToken)
-                .addView(view)
-                .addView(new google.picker.DocsUploadView())
-                .setDeveloperKey(API_KEY)
-                .setCallback(pickerCallback)
-                .build();
-            picker.setVisible(true);
+                const picker = new google.picker.PickerBuilder()
+                    .setDeveloperKey(API_KEY)
+                    .setAppId(APP_ID)
+                    .setOAuthToken(accessToken)
+                    .addView(docsView)
+                    .setCallback(pickerCallback)
+                    .setOrigin(window.location.protocol + '//' + window.location.host)
+                    .setMaxItems(1)
+                    .build();
+                    
+                picker.setVisible(true);
+                console.log('Picker created successfully');
+            } catch (error) {
+                console.error('Error creating picker:', error);
+                updateStatus('Error opening Google Drive picker. Check console for details.');
+            }
         }
 
         // Handle picker selection
