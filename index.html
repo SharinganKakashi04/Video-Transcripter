@@ -416,7 +416,6 @@
         // ⚠️ REPLACE THESE WITH YOUR ACTUAL CREDENTIALS ⚠️
         const CLIENT_ID = '822621451487-4dbnhrq9m6eijk0rk8baipoo84ojsp8q.apps.googleusercontent.com';
         const API_KEY = 'AIzaSyBw2Ae8R1-dJ0eI7ILxRyRP5gPqZEFZWpw';
-        
         const APP_ID = 'transcripter-476205';
 
         // Get all HTML elements
@@ -448,10 +447,7 @@
             updateStatus('Loading transcription model... (this may take a moment)', true);
 
             try {
-                transcriber = await pipeline('automatic-speech-recognition', 'Xenova/whisper-tiny.en', {
-                    quantized: true,
-                    revision: 'default'
-                });
+                transcriber = await pipeline('automatic-speech-recognition', 'Xenova/whisper-tiny.en');
                 updateStatus('Model loaded. Ready to transcribe.');
             } catch (error) {
                 console.error('Model loading failed:', error);
@@ -531,6 +527,7 @@
         function createPicker() {
             try {
                 // Create view for selecting files from Drive
+                // View for selecting existing files from Drive
                 const docsView = new google.picker.DocsView()
                     .setIncludeFolders(true)
                     .setMimeTypes('video/mp4,video/webm,video/ogg,video/quicktime,video/avi,video/x-msvideo,video/x-matroska,video/mkv');
@@ -544,7 +541,7 @@
                     .setOrigin(window.location.protocol + '//' + window.location.host)
                     .setMaxItems(1)
                     .build();
-                    
+
                 picker.setVisible(true);
                 console.log('Picker created successfully');
             } catch (error) {
@@ -579,7 +576,7 @@
                     // Create blob from response
                     const blob = await response.blob();
                     videoPlayer.src = URL.createObjectURL(blob);
-                    
+
                     transcribeBtn.disabled = false;
                     transcribeBtn.classList.add('ready');
                     updateStatus('File downloaded. Ready to transcribe!');
@@ -606,13 +603,11 @@
                 const audioData = await extractAndResampleAudio(videoPlayer);
                 if (!audioData) throw new Error("Could not extract audio. Please try a different file.");
 
-                const durationMinutes = Math.ceil(audioData.length / 16000 / 60);
-                updateStatus(`Transcribing ${durationMinutes} minute(s) of audio... This may take 2-5 minutes.`, true);
+                // Transcribe
+                updateStatus('Transcribing audio... This can take a while.', true);
                 const output = await transcriber(audioData, {
                     chunk_length_s: 30,
                     stride_length_s: 5,
-                    language: 'english',
-                    task: 'transcribe'
                 });
 
                 // Display result
@@ -688,5 +683,3 @@
         }
     </script>
 </body>
-
-</html>
